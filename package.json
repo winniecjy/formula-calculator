@@ -1,0 +1,30 @@
+{
+  "name": "gulp-tpl",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Cai Jieying<593775823@qq.com>",
+  "license": "MIT",
+  "description": "gulp 开发环境",
+  "scripts": {
+    "build": "gulp default",
+    "start": "gulp server"
+  },
+  "devDependencies": {
+    "browser-sync": "^2.26.7",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^5.0.0",
+    "gulp-clean-css": "^3.9.3",
+    "gulp-htmlmin": "^4.0.0",
+    "gulp-imagemin": "^4.1.0",
+    "gulp-sass": "^4.0.1",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-uglify": "^3.0.0",
+    "gulp-util": "^3.0.8",
+    "gulp-watch-path": "^0.1.0",
+    "stream-combiner": "^0.2.2"
+  },
+  "dependencies": {
+    "global": "^4.3.2",
+    "node-sass": "^4.8.3"
+  }
+}

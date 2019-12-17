@@ -1,5 +1,7 @@
 const gulp = require('gulp');
 const uglify = require('gulp-uglify');
+const babel = require('gulp-babel');
+const browserify = require('browserify');
 const watchPath = require('gulp-watch-path');
 const gutil = require('gulp-util');
 const combiner = require('stream-combiner2');
@@ -41,6 +43,7 @@ gulp.task('watchjs', function () {
             gulp.src(paths.srcPath),
             sourcemaps.init(),
             uglify(),
+            // browserify(),
             sourcemaps.write('./'),
             gulp.dest(paths.distDir)
         ]);
@@ -51,35 +54,56 @@ gulp.task('watchjs', function () {
 // uglify js
 gulp.task('uglifyjs', function () {
     var combined = combiner.obj([
-        gulp.src('src/js/**/*.js'),
-        sourcemaps.init(),
+        gulp.src('src/js/index.js'),
+        babel({
+            presets: [
+                ["env", {
+                  "modules": false,
+                  "targets": {
+                    "browsers": ["> 1%", "last 2 versions", "not ie <= 8"]
+                  }
+                }],
+                "stage-2"
+              ],
+              "plugins": ["transform-runtime", "transform-es2015-modules-commonjs"]            
+        }),
+        browserify(),
         uglify(),
-        sourcemaps.write('./'),
+        // sourcemaps.write('./'),
         gulp.dest('dist/js/')
     ]);
     combined.on('error', handleError)
 });
+// browserify
+// gulp.task("browserify", function () {
+//     var b = browserify({
+//         entries: "dist/js/index.js"
+//     });
+//     return b.bundle()
+//         .pipe(source("index.js"))
+//         .pipe(gulp.dest("dist/js"));
+// });
 // watch sass
-gulp.task('watchscss',function(){
-   gulp.watch('src/scss/**/*.scss',function(event){
-       const paths = watchPath(event,'src/scss/','dist/css/');
-       gutil.log(gutil.colors.green(event.type) + ' ' + paths.srcPath);
-       gutil.log('Dist: ' + paths.distDir);
-       paths.srcPath = 'src\\scss\\style.scss';
-    //    if(paths.srcPath !== 'src\\scss\\style.scss') return false;
-       const combined = combiner.obj([
-           gulp.src(paths.srcPath),   
-           sourcemaps.init(),
-           autoprefixer({
-               browsers: 'last 2 versions'
-           }),
-           sass(), 
-           cleancss(),
-           sourcemaps.write('./'),
-           gulp.dest(paths.distDir)
-       ]);
-       combined.on('error', handleError);
-   });
+gulp.task('watchscss', function () {
+    gulp.watch('src/scss/**/*.scss', function (event) {
+        const paths = watchPath(event, 'src/scss/', 'dist/css/');
+        gutil.log(gutil.colors.green(event.type) + ' ' + paths.srcPath);
+        gutil.log('Dist: ' + paths.distDir);
+        paths.srcPath = 'src/scss/**/style.scss';
+        //    if(paths.srcPath !== 'src\\scss\\style.scss') return false;
+        const combined = combiner.obj([
+            gulp.src(paths.srcPath),
+            sourcemaps.init(),
+            autoprefixer({
+                browsers: 'last 2 versions'
+            }),
+            sass(),
+            cleancss(),
+            sourcemaps.write('./'),
+            gulp.dest(paths.distDir)
+        ]);
+        combined.on('error', handleError);
+    });
 });
 // sass
 gulp.task('scsscss', function () {
@@ -89,12 +113,12 @@ gulp.task('scsscss', function () {
         autoprefixer({
             browsers: 'last 2 versions'
         }),
-        sass(), 
+        sass(),
         cleancss(),
         sourcemaps.write('./'),
         gulp.dest('dist/css')
 
-    ]); 
+    ]);
     combined.on('error', handleError);
 });
 // watch image
@@ -131,14 +155,14 @@ gulp.task('watchhtml', function () {
         gutil.log(gutil.colors.green(event.type + ' ' + paths.srcPath));
         gutil.log('Dist ' + paths.distPath);
         const options = {
-            removeComments: true,//清除HTML注释
-            collapseWhitespace: true,//压缩HTML
-            collapseBooleanAttributes: true,//省略布尔属性的值 <input checked="true"/> ==> <input />
-            removeEmptyAttributes: true,//删除所有空格作属性值 <input id="" /> ==> <input />
-            removeScriptTypeAttributes: true,//删除<script>的type="text/javascript"
-            removeStyleLinkTypeAttributes: true,//删除<style>和<link>的type="text/css"
-            minifyJS: true,//压缩页面JS
-            minifyCSS: true//压缩页面CSS
+            removeComments: true, //清除HTML注释
+            collapseWhitespace: true, //压缩HTML
+            collapseBooleanAttributes: true, //省略布尔属性的值 <input checked="true"/> ==> <input />
+            removeEmptyAttributes: true, //删除所有空格作属性值 <input id="" /> ==> <input />
+            removeScriptTypeAttributes: true, //删除<script>的type="text/javascript"
+            removeStyleLinkTypeAttributes: true, //删除<style>和<link>的type="text/css"
+            minifyJS: true, //压缩页面JS
+            minifyCSS: true //压缩页面CSS
         };
         const combined = combiner.obj([
             gulp.src(paths.srcPath),
@@ -149,16 +173,16 @@ gulp.task('watchhtml', function () {
     });
 });
 // htmlmin
-gulp.task('htmlmin', function(){
+gulp.task('htmlmin', function () {
     const options = {
-        removeComments: true,//清除HTML注释
-        collapseWhitespace: true,//压缩HTML
-        collapseBooleanAttributes: true,//省略布尔属性的值 <input checked="true"/> ==> <input />
-        removeEmptyAttributes: true,//删除所有空格作属性值 <input id="" /> ==> <input />
-        removeScriptTypeAttributes: true,//删除<script>的type="text/javascript"
-        removeStyleLinkTypeAttributes: true,//删除<style>和<link>的type="text/css"
-        minifyJS: true,//压缩页面JS
-        minifyCSS: true//压缩页面CSS
+        removeComments: true, //清除HTML注释
+        collapseWhitespace: true, //压缩HTML
+        collapseBooleanAttributes: true, //省略布尔属性的值 <input checked="true"/> ==> <input />
+        removeEmptyAttributes: true, //删除所有空格作属性值 <input id="" /> ==> <input />
+        removeScriptTypeAttributes: true, //删除<script>的type="text/javascript"
+        removeStyleLinkTypeAttributes: true, //删除<style>和<link>的type="text/css"
+        minifyJS: true, //压缩页面JS
+        minifyCSS: true //压缩页面CSS
     };
     gulp.src('src/**/*.html')
         .pipe(htmlmin(options))
@@ -185,23 +209,21 @@ gulp.task('copy', function () {
 
 // default task
 gulp.task('default', [
-        // build
-        'uglifyjs', 'scsscss', 'imagemin', 'copy', 'htmlmin',
-        // watch
-        'watchjs', 'watchscss', 'watchimage', 'watchcopy', 'watchhtml'
-    ]
-);
+    // build
+    'uglifyjs', 'scsscss', 'imagemin', 'copy', 'htmlmin',
+    // watch
+    'watchjs', 'watchscss', 'watchimage', 'watchcopy', 'watchhtml'
+]);
 
 // live server
 gulp.task('server', ['default'], function () {
     browserSync({
-    server: {
-        baseDir: ['dist'],
-        port: 3000
-    },
-    }, function(err, bs) {
-    console.log(bs.options.getIn(["urls", "local"]));
+        server: {
+            baseDir: ['dist'],
+            port: 3000
+        },
+    }, function (err, bs) {
+        console.log(bs.options.getIn(["urls", "local"]));
     });
-
     gulp.watch(['dist/**/*.*', 'dist/*.html'], browserSync.reload);
 });

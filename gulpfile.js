@@ -2,6 +2,9 @@ const gulp = require('gulp');
 const uglify = require('gulp-uglify');
 const babel = require('gulp-babel');
 const browserify = require('browserify');
+const babelify = require('babelify');
+const source = require('vinyl-source-stream');
+const buffer = require('vinyl-buffer');
 const watchPath = require('gulp-watch-path');
 const gutil = require('gulp-util');
 const combiner = require('stream-combiner2');
@@ -53,26 +56,70 @@ gulp.task('watchjs', function () {
 });
 // uglify js
 gulp.task('uglifyjs', function () {
-    var combined = combiner.obj([
-        gulp.src('src/js/index.js'),
-        babel({
-            presets: [
-                ["env", {
-                  "modules": false,
-                  "targets": {
-                    "browsers": ["> 1%", "last 2 versions", "not ie <= 8"]
-                  }
-                }],
-                "stage-2"
-              ],
-              "plugins": ["transform-runtime", "transform-es2015-modules-commonjs"]            
-        }),
-        browserify(),
-        uglify(),
-        // sourcemaps.write('./'),
-        gulp.dest('dist/js/')
-    ]);
-    combined.on('error', handleError)
+    return browserify({
+        debug: true,
+        entries: 'src/js/index.js',
+    })
+    .on('error', function (err) { 
+        console.error(err); 
+        this.emit('end'); 
+    })
+    .transform(babelify, {  //此处babel的各配置项格式与.babelrc文件相同
+        presets: [
+            ["env", {
+              "modules": false,
+              "targets": {
+                "browsers": ["> 1%", "last 2 versions", "not ie <= 8"]
+              }
+            }],
+            "stage-2"
+        ],
+        plugins: ["transform-runtime", "transform-es2015-modules-commonjs"]     
+      })
+      .bundle()
+      .pipe(source('bundle.js')) //将常规流转换为包含Stream的vinyl对象，并且重命名
+      .pipe(buffer())  //将vinyl对象内容中的Stream转换为Buffer
+      .pipe(gulp.dest('dist/js/'))
+    // var combined = combiner.obj([
+    //     // gulp.src('src/js/**.js'),
+    //     // babel({
+    //     //     presets: [
+    //     //         ["env", {
+    //     //           "modules": false,
+    //     //           "targets": {
+    //     //             "browsers": ["> 1%", "last 2 versions", "not ie <= 8"]
+    //     //           }
+    //     //         }],
+    //     //         "stage-2"
+    //     //       ],
+    //     //       "plugins": ["transform-runtime", "transform-es2015-modules-commonjs"]            
+    //     // }),
+    //     browserify({
+    //         extensions: ['.jsx', '.js'],
+    //         debug: true,
+    //         cache: {},
+    //         packageCache: {},
+    //         fullPaths: true,
+    //         entries: 'src/js/index.js',
+    //     })
+    //     .transform(babelify, {  //此处babel的各配置项格式与.babelrc文件相同
+    //         presets: [
+    //             ["env", {
+    //               "modules": false,
+    //               "targets": {
+    //                 "browsers": ["> 1%", "last 2 versions", "not ie <= 8"]
+    //               }
+    //             }],
+    //             "stage-2"
+    //         ],
+    //         plugins: ["transform-runtime", "transform-es2015-modules-commonjs"]     
+    //       })
+    //       .pipe(gulp.dest('dist/js/'))
+    //     // uglify(),
+    //     // sourcemaps.write('./'),
+    //     // gulp.dest('dist/js/')
+    // ]);
+    // combined.on('error', handleError)
 });
 // browserify
 // gulp.task("browserify", function () {

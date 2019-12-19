@@ -45,7 +45,7 @@ gulp.task('watchjs', function () {
         const combined = combiner.obj([
             gulp.src(paths.srcPath),
             sourcemaps.init(),
-            uglify(),
+            // uglify(),
             // browserify(),
             sourcemaps.write('./'),
             gulp.dest(paths.distDir)

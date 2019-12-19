@@ -15,5 +15,7 @@ submitBtn.addEventListener('click', function(e) {
       field2:	7,
     },
   }
-  console.log(calcFormula(formula, data))
+
+  const result = calcFormula({formula, data})
+  document.getElementById('result').innerText = result
 })

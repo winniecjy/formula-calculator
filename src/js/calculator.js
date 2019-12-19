@@ -78,6 +78,7 @@ function infixToPostFix(infix, postfix) {
         operands += infix[i++]
       }
       postfix.push(operands)
+      i--;
     } else {// 处理操作符做出处理
       handlerSymbol(c, postfixHelper, postfix)
     }
@@ -109,6 +110,7 @@ function calcPostFix(postfix, data) {
       if (op1 === null || op2 === null) {
         helperStack.push(null)
       } else {
+
         switch (c) {
           case "+":
             helperStack.push(op2 + op1)

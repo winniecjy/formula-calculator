@@ -18,6 +18,7 @@ export function Stack() {
     pop,
     top,
     empty,
+    arr,
   }
 }
 

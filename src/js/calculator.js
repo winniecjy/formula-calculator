@@ -54,7 +54,7 @@ function handlerSymbol(c, postfixHelper, postfix) {
       // 并将其压入postfix（后缀表达式）中
       postfix.push(sym)
       // 递归调用handler,比较当前符号c与下一个栈顶符号的优先性
-      handler(c, postfixHelper, postfix)
+      handlerSymbol(c, postfixHelper, postfix)
     } else {
       // 如果c比栈顶符号优先级大，那将c压入coll2(操作符栈）中
       postfixHelper.push(c)
